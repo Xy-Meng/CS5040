@@ -1,0 +1,55 @@
+#include <iostream>     // Provides cout and cin
+#include <cstdlib>      // Provides EXIT_SUCCESS
+#include "node.h"       // With Item defined as an int
+
+using namespace std;
+void list_head_insert(node *&head_ptr, const node::value_type &entry) {
+        head_ptr = new node(entry, head_ptr);
+    }
+
+void splitting(node *head_ptr, const node::value_type &target, node * &h1, node *& h2)
+    // Library facilities used: cstdlib
+    //Creat two linked list and perserve the original one.
+    { int i=5;  int j=10;
+       
+    if(head_ptr==NULL)
+        {
+           return ;
+        }
+        node *cursor,*cursor1,*cursor2;
+
+        for (cursor = head_ptr; cursor != NULL; cursor = cursor->link())
+        {
+            if (cursor->data() < target){
+                list_head_insert(h1, cursor->data());
+                i++;}
+            else{
+                list_head_insert(h2, cursor->data());
+                  j++;}
+        }
+         for(cursor1 = h1;cursor1!=NULL;cursor1 = cursor1->link())
+            cout<<cursor1->data()<<endl;
+            //cout <<i<<endl;
+            for(cursor2 = h2;cursor2!=NULL;cursor2 = cursor2->link())
+            cout<<cursor2->data()<<endl;
+        //return h2;
+            //cout <<h2->data()<<endl;
+            //cout <<j<<endl;
+       
+    }
+int main()
+{
+    node* t = new node();
+    cout << t->data() << " " << t->link() <<endl;
+    
+	node* p = new node(12.1);
+    node* q = new node(4.9, p);
+    node* r = new node(1.6, q);
+    
+    for(node *i = r; i != NULL; i = i->link())
+        cout << i->data() <<endl;
+    node *h1,*h2;
+  splitting(r,2.0,h1,h2);
+  
+	return EXIT_SUCCESS;
+}
