@@ -1,0 +1,12 @@
+#include "node.h"
+
+
+
+node::~node()
+{
+    delete [] link_field;
+}
+
+void node::list_head_insert(node *&head_ptr, const node::value_type &entry) {
+        head_ptr = new node(entry, head_ptr);
+    }
