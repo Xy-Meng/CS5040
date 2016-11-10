@@ -1,0 +1,175 @@
+  Templates
+
+Until now, we have only seen functions and data structures that deal with fixed data types. Here, we'll show you how to generalize these functions and data structures through the use of templates. First, we'll look at template functions, then template classes.
+
+1. Template Functions
+
+Suppose we want to write a function that finds the maximum of two things. To find the maximum of two integers we would write:
+
+int maximum(int a, int b) 
+{
+  if (a > b) 
+    return a; 
+  else 
+    return b; 
+} 
+and to find the maximum of two doubles we would write:
+
+double maximum(double a, double b) 
+{
+ if (a > b) 
+   return a; 
+ else 
+   return b; 
+} 
+and so on. You can imagine that we would have to write a separate function for every data type (chars, strings, dates, etc.), but notice that the body of each function is exactly the same!!!
+
+A better approach would be to write a template function. We can write the code once and use it with different types of things.
+
+1.1 Template Function Definition
+
+The definition of a template function depends on an underlying data type. For example:
+
+template <class Type> 
+Type maximum(Type a, Type b) 
+{ 
+  if (a > b) 
+    return a; 
+  else 
+    return b; 
+} 
+The first line is the template prefix, which tells the compiler that Type is a data type that will be filled in later. The "unspecified type" Type is called the template parameter.
+
+Note: This template function requires that its parameters can be compared with greater than (>).
+1.2 Using Template Functions
+
+Template functions are used (called) in exactly the same way as regular functions.
+
+For example, if we want to output the maximum of the integers 1000 and 2000, we would write:
+
+cout << maximum(1000, 2000) << endl; // will print 2000
+The maximum function is said to be instantiated with Type set to int.
+
+Similarly, we could do:
+
+cout << maximum('a', 'z') << endl; // will print 'z'
+string s1("foo");
+string s2("bar");
+cout << maximum(s1, s2) << endl; // will print "foo" 
+Note: The compiler will do the work of generating a new version of the function as many times as it is used with different data types. For example, if the program uses a template version of maximum() to find the maximum of two integers and two doubles, the compiler will generate code for two versions of the function, one for ints and one for doubles.
+It is only when the function is instantiated (i.e., by code that calls the function) that the compiler compiles a certain version of the template function, using the specified type.
+
+Requirements:
+The template parameter must appear in the parameter list of the template function.
+When a template function is instantiated, the compiler tries to select a single type for the template parameter that exactly matches the values passed. In other words, the compiler doesn't convert arguments for a template function. For example:
+cout << maximum(3.14, 1) << endl;
+will generate a compile error, because Type cannot be matched to both double (the type of 3.14) and int (the type of 1).
+
+2. Template Classes
+
+A template class is a class that depends on an underlying data type just like a template function.
+
+2.1. Template Class Definition
+
+The class definition of a template class starts with a template prefix:
+
+template <class Type> 
+class SomeClass
+{ 
+  ...
+}; 
+Inside the class, the template parameter Type can be used, but won't be filled in until the template class is instantiated.
+
+As an example, let's look at a template class, Array, which implements a resizable array. The class definition is in file array.h.
+
+2.2. Template Class Method Definitions
+
+The methods for our template Array class are available in file array.tem.
+
+In the method definitions, some rules must be followed to tell the compiler about the dependency on the template parameter:
+
+The template prefix is placed immediately before each method. E.g.:
+template <class Item>
+void Array<Item>::resize(int new_size)
+{
+  ...
+}
+Each use of the class name as the name of the class must be followed by the template parameter. E.g.:
+template <class Item>
+Array<Item>::Array()
+{
+  ...
+}
+Note: The second use of "Array" is used as the name of the constructor, not as a class name, so it doesn't require the parameter.
+The type parameter can be used by itself. E.g.:
+template <class Item>
+Item &Array::operator [](int index)
+{
+  ...
+}
+Note: Our implementation of the Array class relies on being able to assign items to one another.
+2.3. Usage
+
+To create a resizable array, we now just need to instantiate the class with a data type. For example:
+
+Array<int> iarray;  // array of integers
+Array<string> sarray; // array of strings
+We can then use them:
+
+iarray.resize(10);
+iarray[6] = 19;
+sarray.resize(5);
+sarray[2] = string("foo");
+The file arraytest.cpp instantiates our Array class with a couple types of elements.
+
+2.4. Header and Implementation Files
+
+For non-templates (functions or classes) stored in a module, we organized them as follows:
+
+main.cpp              mod.h                 mod.cpp
+-------------------   --------------------  --------------------
+|#include "mod.h" |   |...               |  |#include "mod.h"  |
+|...              |   |                  |  |...               |
+-------------------   --------------------  --------------------
+And we compiled the code that uses the module (here, main.cpp) together with the code that implements the module, mod.cpp (likewise we could just link their object files together).
+
+With templates (functions or classes) stored in a module, the implementation should be included in the header file. It is common practice to put the function implementations in a separate implementation file, and then include this file in the header file.
+
+main.cpp              mod.h                 mod.tem
+-------------------   --------------------  --------------------
+|#include "mod.h" |   |...               |  |...               |
+|...              |   |#include "mod.tem"|  |                  |
+-------------------   --------------------  --------------------
+To compile the code, we just compile the code that uses the module (here, main.cpp) since the entire template code gets included.
+
+Note: Template functions or classes cannot be compiled until they are instantiated (i.e., the template parameter is filled in). Thus, a module with a template cannot be compiled by itself.
+Compile the array test program and run it.
+
+Exercise
+
+You are given a List class (list.h and list.cpp) that represents a linked list of integers.
+
+Complete the methods insertAtBeginning() and removeFromEnd(). Then compile the list module with the main program listtest.cpp to ensure it works.
+Change the linked list into a template class:
+Rename the implementation file list.cpp to list.tem.
+In list.h:
+Add the template prefix "template <class Item>" to the class definition.
+Replace uses of int (as the type of items) with the template parameter Item.
+Add #include "list.tem" after the class definition.
+In list.tem:
+Remove the #include "list.h".
+Add the template prefix "template <class Item>" to all method definitions.
+Change all "List::" to "List<Item>::".
+Replace uses of int (as the type of items) with the template parameter Item.
+Change the main program to instantiate a List with type int. Compile the new program and run it.
+A few final notes
+
+We can instantiate template classes not only with basic data types or user-defined classes, but also with other template classes. For example, if we want to create an Array of vectors of integers, we could do:
+Array<vector <int> > arrayOfVecOfInts;
+Important Note: There must be a space between the first and second ">". Otherwise the compiler will interpret it as the token ">>" and will generate a compiler error.
+
+Most contemporary C++ compilers now come with a Standard Template Library (STL), which defines a set of very useful template classes, for example vector, stack, queue and many others that are widely used in a variety of applications. So, before you implement a general purpose template, take a look at the STL, you may find what you are looking for.
+BU CAS CS - Templates 
+This page created by Jonathan Alon <jalon@cs.bu.edu>. 
+Material adapted from the textbook "Data Structures and Other Objects Using C++", by Main and Savitch. 
+Modified by Robert I. Pitts <rip@bu.edu>
