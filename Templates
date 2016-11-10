@@ -1,4 +1,4 @@
-  Templates
+  # Templates
 
 Until now, we have only seen functions and data structures that deal with fixed data types. Here, we'll show you how to generalize these functions and data structures through the use of templates. First, we'll look at template functions, then template classes.
 
